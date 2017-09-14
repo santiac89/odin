@@ -1,0 +1,35 @@
+{
+  "api": {
+    "host": "localhost",
+    "port": 3000
+  },
+  "opensubtitles": {
+    "langs": ["spa", "eng"],
+    "useragent": "",
+    "username": "",
+    "password": ""
+  },
+  "torrent_streamer": {
+    "port": 3002
+  },
+  "disk_streamer": {
+    "port": 3003
+  },
+  "webtorrent": {
+    "tmp_ttl": 7200000,
+    "download_path": ""
+  },
+  "pushbullet": {
+    "token": ""
+  },
+  "dropbox": {
+    "watch_interval": 900000,
+    "token": "",
+    "torrentsPath": "/torrents"
+  },
+  "google_cse": {
+    "api_key": "",
+    "cse_id": ""
+  },
+  "public_path": "./public"
+}
