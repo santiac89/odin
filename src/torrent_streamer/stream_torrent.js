@@ -2,20 +2,25 @@ const WebTorrent = require('webtorrent')
 const config = require('config')
 const log = require('debug')('odin:torrent_manager')
 const utils = require('../utils')
+const fs = require('fs')
+
+const folder = `${__dirname}/tmp`
+
+if (!fs.existsSync(folder)) {
+  fs.mkdirSync(folder)
+}
 
 const webTorrentClient = new WebTorrent()
 const tmpTorrents = {}
 
 const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {
-  const path = config.webtorrent.paths.tmp
-
   if (!utils.isValidTorrentLink(magnetOrUrl)) {
     return reject('Invalid torrent URL or magnetURI.')
   }
 
   tmpTorrents[magnetOrUrl] = true
 
-  webTorrentClient.add(magnetOrUrl, { path }, (torrent) => {
+  webTorrentClient.add(magnetOrUrl, { folder }, (torrent) => {
     tmpTorrents[magnetOrUrl] = torrent
 
     torrent.on('done', () => {

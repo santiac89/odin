@@ -4,8 +4,9 @@ const https = require('https')
 const http = require('http')
 const log = require('debug')('odin:utils')
 const fs = require('fs')
+const magnet = require('magnet-uri')
 const subtitlesManager = require('./subtitles_manager')
-
+const validUrl = require('valid-url')
 const TORRENT_STREAM = 'torrent'
 const DISK_STREAM = 'disk'
 

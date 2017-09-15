@@ -8,7 +8,7 @@ const fetchPoster = (movieName, fileName) => {
     log('Error: movieName empty!')
     return Promise.resolve()
   }
-console.log(movieName)
+
   const sanitized = movieName.replace(/\[/g, '-"').replace(/[\(\)]/g, '').replace(/[\]]/g, '"')
 
   return googleImages

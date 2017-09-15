@@ -42,10 +42,11 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
             torrentsLog
               .remove(magnetOrUrl)
               .then(() => { if (isFile) fs.unlinkSync(magnetOrUrl); return true }) // Remove .torrent file if is a file
-              .then(() => subtitlesManager.fetchSubtitles(torrent.path + '/' + file.path))
+              .then(() => subtitlesManager.fetchSubtitles(torrent.path + '/' + file.name))
               .then(() => postersManager.fetchPoster(torrent.name, file.name))
               .then(() => fs.renameSync(torrent.path, `${config.webtorrent.download_path}/${torrent.name}`)) // Move to final download folder
               .then(() => library.reload())
+              .then(() => webTorrentClient.remove(magnetOrUrl))
               .then(() => torrent.emit('completed'))
           })
 

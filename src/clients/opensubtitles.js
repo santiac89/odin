@@ -6,14 +6,14 @@ const OS = require('opensubtitles-api')
 const config = require('config')
 const { downloadFile } = require('../utils')
 
-const OpenSubtitles = new OS({
-  useragent: config.opensubtitles.useragent,
-  username: config.opensubtitles.username,
-  password: config.opensubtitles.password,
-  ssl: true
-})
-
 const downloadSubtitles = (moviePath) => {
+  const OpenSubtitles = new OS({
+    useragent: config.opensubtitles.useragent,
+    username: config.opensubtitles.username,
+    password: config.opensubtitles.password,
+    ssl: true
+  })
+
   const filename = path.basename(moviePath)
 
   return OpenSubtitles.login()
