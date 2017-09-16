@@ -1,12 +1,13 @@
 const fs = require('fs')
 
 const streamFromDisk = (path, request, response) => {
-  const stats = fs.statSync(path)
-  const { start, end } = parsePositions(request.headers.range, stats.size)
+  fs.stat(path, (stats) => {
+    const { start, end } = parsePositions(request.headers.range, stats.size)
 
-  let stream = fs.createReadStream(path, { start, end })
+    let stream = fs.createReadStream(path, { start, end })
 
-  streamToResponse(stream, start, end, stats.size, response)
+    streamToResponse(stream, start, end, stats.size, response)
+  })
 }
 
 const streamFromTorrent = (torrentManager, magnetOrTorrent, request, response) => {
