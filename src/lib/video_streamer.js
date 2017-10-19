@@ -12,18 +12,15 @@ const streamFromDisk = (path, request, response) => {
 }
 
 const streamFromTorrent = (torrent, request, response) => {
-  // torrentManager.download(magnetOrTorrent)
-    // .then(({ file }) => {
-    const file = utils.findVideoFile(torrent)
+  const file = utils.findVideoFile(torrent)
 
-    if (!file) return response.status(500).json({ message: "Can't play file" })
+  if (!file) return response.status(500).json({ message: "Can't play file" })
 
-    const { start, end } = parsePositions(request.headers.range, file.length)
+  const { start, end } = parsePositions(request.headers.range, file.length)
 
-    let stream = file.createReadStream({ start, end })
+  let stream = file.createReadStream({ start, end })
 
-    streamToResponse(stream, start, end, file.length, response)
-    // })
+  streamToResponse(stream, start, end, file.length, response)
 }
 
 const streamToResponse = (stream, start, end, total, response) => {

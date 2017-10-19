@@ -34,16 +34,4 @@ const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {
 
 const download = (magnetOrTorrent) => tmpTorrents[magnetOrTorrent] ? Promise.resolve(tmpTorrents[magnetOrTorrent]) : downloadTmp(magnetOrTorrent)
 
-  // if (torrent) {
-    // return
-    // const file = utils.findVideoFile(torrent)
-    // if (!file) return reject(`Can't play file`)
-    // return resolve({ file: file, path: `${torrent.path}/${file.path}` });
-  // }
-//
-
-    // .then(() => getVideoFileFromTorrent(magnetOrTorrent))
-    // .then(resolve)
-// })
-
 module.exports = { download }
