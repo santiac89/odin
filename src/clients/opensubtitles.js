@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const OS = require('opensubtitles-api')
 const config = require('config')
-const { downloadFile } = require('../utils')
+const { downloadFile } = require('../lib/utils')
 
 const downloadSubtitles = (moviePath) => {
   const OpenSubtitles = new OS({
@@ -19,7 +19,7 @@ const downloadSubtitles = (moviePath) => {
   return OpenSubtitles.login()
     .then(() =>
       OpenSubtitles
-        .search({ sublanguageid: config.opensubtitles.langs.join(','), filename })
+        .search({ filename })
         .then(subtitles => {
           const promises = Object.keys(subtitles).map(lang => {
             return downloadFile(subtitles[lang].url, moviePath.replace(/mp4$/, `${lang}.srt`))

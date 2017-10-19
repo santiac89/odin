@@ -1,6 +1,6 @@
 const log = require('debug')('odin:posters_manager.js')
 const config = require('config')
-const googleImages = require('./clients/google_images')
+const googleImages = require('../clients/google_images')
 const utils = require('./utils')
 
 const fetchPoster = (movieName, fileName) => {
@@ -9,10 +9,10 @@ const fetchPoster = (movieName, fileName) => {
     return Promise.resolve()
   }
 
-  const sanitized = movieName.replace(/\[/g, '-"').replace(/[\(\)]/g, '').replace(/[\]]/g, '"')
+  const sanitizedMovieName = movieName.replace(/\[/g, '-"').replace(/[\(\)]/g, '').replace(/[\]]/g, '"')
 
   return googleImages
-    .search(`${sanitized} movie poster`)
+    .search(`${sanitizedMovieName} movie poster`)
     .then(body => {
       const jsonBody = JSON.parse(body)
 

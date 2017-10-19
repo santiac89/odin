@@ -1,12 +1,8 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const config = require('config')
-const fs = require('fs')
-const srt2vtt = require('srt-to-vtt')
-
 const torrentManager = require('./stream_torrent')
-const videoStreamer = require('../video_streamer')
-const utils = require('../utils')
+const videoStreamer = require('../lib/video_streamer')
+const htmlGenerator = require('../lib/html_generator')
 
 const app = express()
 /*
@@ -24,12 +20,16 @@ app.use(function (req, res, next) {
 /*
 *       API
 */
-app.get('/torrentStream', (req, res) => videoStreamer.streamFromTorrent(torrentManager, req.query.url, req, res))
-
-app.get('/subtitlesStream', (req, res) => fs.createReadStream(req.query.path).pipe(srt2vtt()).pipe(res))
+app.get('/torrentStream', (req, res) => {
+  torrentManager
+    .download(req.query.url)
+    .then(torrent => videoStreamer.streamFromTorrent(torrent, req, res))
+})
 
 app.get('/torrentPlayer', (req, res) => {
-  utils.generateHtmlPlayerForTorrent(torrentManager, req.query.url)
+  torrentManager
+    .download(req.query.url)
+    .then(torrent => htmlGenerator.generateForTorrent(torrent, req.query.url))
     .then(html => res.send(html))
     .catch(err => res.status(500).send(err))
 })

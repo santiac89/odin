@@ -2,7 +2,7 @@ const log = require('debug')('odin:torrents_log')
 const fs = require('fs')
 
 const torrents = {}
-const folder = `${__dirname}/inprogress`
+const folder = `${__dirname}/../../inprogress`
 
 if (!fs.existsSync(folder)) {
   fs.mkdirSync(folder)

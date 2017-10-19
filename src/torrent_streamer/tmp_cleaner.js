@@ -1,13 +1,13 @@
 const config = require('config')
 const rimraf = require('rimraf')
 const fs = require('fs')
+const path = require('path')
 
-const folder = `${__dirname}/tmp`
+const folder = path.normalize(`${__dirname}/../../tmp`)
 
 if (!fs.existsSync(folder)) {
   fs.mkdirSync(folder)
 }
-
 
 const tmpCleanerInterval = 3600000
 

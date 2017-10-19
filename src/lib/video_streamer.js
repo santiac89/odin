@@ -1,4 +1,5 @@
 const fs = require('fs')
+const utils = require('./utils')
 
 const streamFromDisk = (path, request, response) => {
   fs.stat(path, (stats) => {
@@ -10,15 +11,19 @@ const streamFromDisk = (path, request, response) => {
   })
 }
 
-const streamFromTorrent = (torrentManager, magnetOrTorrent, request, response) => {
-  torrentManager.getVideoFileFromTorrent(magnetOrTorrent)
-    .then(({ file }) => {
-      const { start, end } = parsePositions(request.headers.range, file.length)
+const streamFromTorrent = (torrent, request, response) => {
+  // torrentManager.download(magnetOrTorrent)
+    // .then(({ file }) => {
+    const file = utils.findVideoFile(torrent)
 
-      let stream = file.createReadStream({ start, end })
+    if (!file) return response.status(500).json({ message: "Can't play file" })
 
-      streamToResponse(stream, start, end, file.length, response)
-    })
+    const { start, end } = parsePositions(request.headers.range, file.length)
+
+    let stream = file.createReadStream({ start, end })
+
+    streamToResponse(stream, start, end, file.length, response)
+    // })
 }
 
 const streamToResponse = (stream, start, end, total, response) => {

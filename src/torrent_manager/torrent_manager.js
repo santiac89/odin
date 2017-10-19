@@ -1,14 +1,16 @@
 const WebTorrent = require('webtorrent')
 const config = require('config')
+const path = require('path')
 const fs = require('fs')
 const log = require('debug')('odin:torrent_manager')
-const subtitlesManager = require('./subtitles_manager')
-const postersManager = require('./posters_manager')
+const subtitlesManager = require('../lib/subtitles_manager')
+const postersManager = require('../lib/posters_manager')
+const library = require('../lib/library')
+const utils = require('../lib/utils')
 const torrentsLog = require('./torrents_log')
-const library = require('./library')
-const utils = require('./utils')
 
-const folder = `${__dirname}/incomplete`
+const folder = path.normalize(`${__dirname}/../../incomplete`)
+
 const webTorrentClient = new WebTorrent()
 const tmpTorrents = {}
 
@@ -33,7 +35,7 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
 
   torrentsLog.touch(magnetOrUrl)
 
-  webTorrentClient.add(magnetOrUrl, { folder }, (torrent) => {
+  webTorrentClient.add(magnetOrUrl, { path: folder }, (torrent) => {
       torrentsLog.add(torrent, magnetOrUrl)
         .then(() => {
           torrent.on('done', () => {

@@ -1,11 +1,7 @@
 const express = require('express')
 const bodyParser = require('body-parser')
-const config = require('config')
-const fs = require('fs')
-const srt2vtt = require('srt-to-vtt')
-
-const videoStreamer = require('../video_streamer')
-const utils = require('../utils')
+const videoStreamer = require('../lib/video_streamer')
+const utils = require('../lib/utils')
 
 const app = express()
 /*
@@ -24,8 +20,6 @@ app.use(function (req, res, next) {
 *       API
 */
 app.get('/diskStream', (req, res) => videoStreamer.streamFromDisk(req.query.path, req, res))
-
-app.get('/subtitlesStream', (req, res) => fs.createReadStream(req.query.path).pipe(srt2vtt()).pipe(res))
 
 app.get('/diskPlayer', (req, res) => {
   utils.generateHtmlPlayerForFile(req.query.path)

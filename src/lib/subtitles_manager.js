@@ -2,8 +2,8 @@ const config = require('config')
 const path = require('path')
 const log = require('debug')('odin:subtitles_manager.js')
 const fs = require('fs')
-const subdb = require('./clients/subdb')
-const opensubtitles = require('./clients/opensubtitles')
+const subdb = require('../clients/subdb')
+const opensubtitles = require('../clients/opensubtitles')
 
 const fetchSubtitles = (moviePath) => new Promise((resolve, reject) => {
   const dirname = path.dirname(moviePath)

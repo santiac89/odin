@@ -1,10 +1,11 @@
 const WebTorrent = require('webtorrent')
 const config = require('config')
 const log = require('debug')('odin:torrent_manager')
-const utils = require('../utils')
+const utils = require('../lib/utils')
 const fs = require('fs')
+const path = require('path')
 
-const folder = `${__dirname}/tmp`
+const folder = path.normalize(`${__dirname}/../../tmp`)
 
 if (!fs.existsSync(folder)) {
   fs.mkdirSync(folder)
@@ -20,7 +21,7 @@ const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {
 
   tmpTorrents[magnetOrUrl] = true
 
-  webTorrentClient.add(magnetOrUrl, { folder }, (torrent) => {
+  webTorrentClient.add(magnetOrUrl, { path: folder }, (torrent) => {
     tmpTorrents[magnetOrUrl] = torrent
 
     torrent.on('done', () => {
@@ -31,18 +32,18 @@ const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {
   })
 })
 
-const getVideoFileFromTorrent = (magnetOrTorrent) => new Promise((resolve, reject) => {
-  const torrent = tmpTorrents[magnetOrTorrent]
+const download = (magnetOrTorrent) => tmpTorrents[magnetOrTorrent] ? Promise.resolve(tmpTorrents[magnetOrTorrent]) : downloadTmp(magnetOrTorrent)
 
-  if (torrent) {
-    const file = utils.findVideoFile(torrent)
-    if (!file) return reject(`Can't play file`)
-    return resolve({ file: file, path: `${torrent.path}/${file.path}` });
-  }
+  // if (torrent) {
+    // return
+    // const file = utils.findVideoFile(torrent)
+    // if (!file) return reject(`Can't play file`)
+    // return resolve({ file: file, path: `${torrent.path}/${file.path}` });
+  // }
+//
 
-  downloadTmp(magnetOrTorrent)
-    .then(() => getVideoFileFromTorrent(magnetOrTorrent))
-    .then(resolve)
-})
+    // .then(() => getVideoFileFromTorrent(magnetOrTorrent))
+    // .then(resolve)
+// })
 
-module.exports = { getVideoFileFromTorrent }
+module.exports = { download }

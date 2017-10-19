@@ -2,9 +2,8 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const config = require('config')
 const qs = require('querystring')
-
-const torrentManager = require('./torrent_manager')
-const library = require('./library')
+const fs = require('fs')
+const srt2vtt = require('srt-to-vtt')
 
 const app = express()
 /*
@@ -38,16 +37,9 @@ app.use(function (req, res, next) {
 */
 app.get('/settings', (req, res) => res.json(config))
 
-app.get('/torrents', (req, res) => res.json(torrentManager.downloading()))
-
 app.get('/library', (req, res) => res.json(library.files()))
 
-app.put('/download', (req, res) => {
-  torrentManager
-    .download(req.body.url)
-    .then(torrent => res.end('OK'))
-    .catch(err => res.status(500).send(err))
-})
+app.get('/subtitlesStream', (req, res) => fs.createReadStream(req.query.path).pipe(srt2vtt()).pipe(res))
 
 app.get('/diskPlayer', (req, res) => {
   const path = qs.stringify({ path: req.query.path })
@@ -59,4 +51,32 @@ app.get('/torrentPlayer', (req, res) => {
   res.redirect(`${req.odin_domain}:${config.torrent_streamer.port}/torrentPlayer?${url}`)
 })
 
-module.exports = app
+const build = (child) => {
+  app.get('/torrents', (req, res) => {
+    child.send({ message: 'downloading' }, undefined, {}, (err) => {
+      if (err) return res.status(500).send(err)
+
+      child.once('message', (message) => {
+        res.json(message.items)
+      })
+    })
+  })
+
+  app.put('/download', (req, res) => {
+    child.send({ message: 'download', magnetOrUrl: req.body.url }, undefined, {}, (err) => {
+      if (err) return res.status(500).send(err)
+
+      child.once('message', (message) => {
+        if (message.result) {
+          res.end('OK')
+        } else {
+          res.status(500).json(message.meta)
+        }
+      })
+    })
+  })
+
+  return app;
+}
+
+module.exports = build

@@ -4,7 +4,7 @@
   "description": "",
   "main": "./src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "DEBUG=odin:* node src/main/index.js",
     "test": "standard-focus"
   },
   "bin": "./src/index.js",
