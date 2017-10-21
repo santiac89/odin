@@ -9,9 +9,14 @@ const findLargestFile = (files) => {
   let max = 0
   let largestFile
 
-  if (!files) return null;
+  if (!files) return null
 
-  files.forEach(file => { if (file.length > max) largestFile = file })
+  files.forEach(file => {
+    if (file.length > max) {
+      max = file.length
+      largestFile = file
+    }
+  })
 
   return largestFile
 }

@@ -4,6 +4,7 @@ const config = require('config')
 const qs = require('querystring')
 const fs = require('fs')
 const srt2vtt = require('srt-to-vtt')
+const library = require('../lib/library')
 
 const app = express()
 /*
@@ -51,6 +52,12 @@ app.get('/torrentPlayer', (req, res) => {
   res.redirect(`${req.odin_domain}:${config.torrent_streamer.port}/torrentPlayer?${url}`)
 })
 
+app.get('/profiles', (req,res) => {
+  fs.readdir('public/profiles', (err, files) => {
+    res.json(files)
+  })
+})
+
 const build = (child) => {
   app.get('/torrents', (req, res) => {
     child.send({ message: 'downloading' }, undefined, {}, (err) => {
@@ -74,9 +81,16 @@ const build = (child) => {
         }
       })
     })
+
+    child.on('reload_library', () => {
+      library.reload()
+    })
   })
+
+  library.reload()
 
   return app;
 }
+
 
 module.exports = build

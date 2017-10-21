@@ -1,18 +1,27 @@
 const torrentManager = require('./torrent_manager')
 const dropboxWatcher = require('./dropbox_watcher')
 
+const profiler = require('../lib/cpuprofiler')
+
+if (process.argv[2] == '-p') {
+  profiler('./public/profiles', 'torrent_manager')
+}
+
 torrentManager
   .resume()
   .then(() => {
     dropboxWatcher.start(torrentManager)
 
-    process.on('message', (obj) => {
-      if (obj.message === 'downloading') {
+    process.on('message', (event) => {
+      if (event.message === 'downloading') {
         process.send({ message: 'downloading', items: torrentManager.downloading() })
-      } else if (obj.message === 'download') {
+      } else if (event.message === 'download') {
         torrentManager
-          .download(obj.magnetOrUrl)
-          .then(() => process.send({ message: 'download', result: true }))
+          .download(event.magnetOrUrl)
+          .then((torrent) => {
+            torrent.once('completed', () => process.send({ message: 'reload_library' }))
+            process.send({ message: 'download', result: true })
+          })
           .catch((err) => process.send({ message: 'download', result: false, meta: err }))
       }
     })

@@ -4,14 +4,20 @@ const { createServer } = require('http')
 const { fork } = require('child_process')
 const log = require('debug')('odin:main')
 const api = require('./api')
-const library = require('../lib/library')
+const profiler = require('../lib/cpuprofiler')
 
-library.reload()
+let args = [];
 
-fork('./src/torrent_streamer/index.js')
-fork('./src/disk_streamer/index.js')
+if (process.argv[2] == '-p') {
+  profiler('./public/profiles', 'main')
+  args[0] = '-p';
+}
 
-const child = fork('./src/torrent_manager/index.js', [], { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] })
+
+fork('./src/torrent_streamer/index.js',args)
+fork('./src/disk_streamer/index.js',args)
+
+const child = fork('./src/torrent_manager/index.js', args, { stdio: [ 'pipe', 'pipe', 'pipe', 'ipc' ] })
 
 let server = createServer(api(child))
 

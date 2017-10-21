@@ -8,10 +8,9 @@ const TORRENT_STREAM = 'torrent'
 const DISK_STREAM = 'disk'
 
 const generateForTorrent = (torrent, url) => {
-  console.log(torrent)
   const file = utils.findVideoFile(torrent)
 
-  if (!file) return response.status(500).json({ message: "Can't play file" })
+  if (!file) return `<div class="error">Sorry. Can't play this torrent :(</div>`;
 
   return generateHtmlPlayer(TORRENT_STREAM, `${torrent.path}/${file.path}`, url)
 }

@@ -17,21 +17,15 @@ const downloadSubtitles = (moviePath) => {
   const filename = path.basename(moviePath)
 
   return OpenSubtitles.login()
-    .then(() =>
-      OpenSubtitles
-        .search({ filename })
-        .then(subtitles => {
-          const promises = Object.keys(subtitles).map(lang => {
-            return downloadFile(subtitles[lang].url, moviePath.replace(/mp4$/, `${lang}.srt`))
-          })
+    .then(() => OpenSubtitles.search({ filename }))
+    .then(subtitles => {
+      const promises = Object.keys(subtitles).map(lang => {
+        return downloadFile(subtitles[lang].url, moviePath.replace(/mp4$/, `${lang}.srt`))
+      })
 
-          return Promise.all(promises)
-        })
-        .catch(err => {
-          log('Error: %s', err)
-          return Promise.resolve([])
-        })
-    ).catch(err => {
+      return Promise.all(promises)
+    })
+    .catch(err => {
       log('Error: %s', err)
       return Promise.resolve([])
     })

@@ -4,6 +4,13 @@ const config = require('config')
 const { createServer } = require('http')
 const tmpCleaner = require('./tmp_cleaner')
 const api = require('./api')
+const profiler = require('../lib/cpuprofiler')
+const heapDump = require('../lib/heapDump')
+
+if (process.argv[2] == '-p') {
+  profiler('./public/profiles', 'torrent_streamer')
+  heapDump.init('./public/profiles', 'torrent_streamer')
+}
 
 let server = createServer(api)
 

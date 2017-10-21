@@ -5,6 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "DEBUG=odin:* node src/main/index.js",
+    "profile": "rm public/profiles/*.cpuprofile && DEBUG=odin:* node src/main/index.js -p",
     "test": "standard-focus"
   },
   "bin": "./src/index.js",
@@ -30,6 +31,7 @@
     "subdb": "0.0.3",
     "subdownloader": "^2.0.1",
     "torrent-stream": "^1.0.3",
+    "v8-profiler": "^5.7.0",
     "valid-url": "^1.0.9",
     "webtorrent": "^0.98.19"
   },

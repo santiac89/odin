@@ -3,7 +3,6 @@ const crypto = require('crypto')
 const dropbox = require('../clients/dropbox')
 const subtitlesManager = require('../lib/subtitles_manager')
 const postersManager = require('../lib/posters_manager')
-const library = require('../lib/library')
 const fs = require('fs')
 const path = require('path')
 
