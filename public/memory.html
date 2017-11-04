@@ -1,0 +1,72 @@
+<html>
+  <head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.1/Chart.bundle.js" type="text/javascript"></script>
+  </head>
+  <body>
+    <select id="profiles">
+
+    </select>
+      <h1>Memory Usage</h1>
+      <canvas id="memoryUsage" width="800" height="300"></canvas>
+      <h1>Scavenge</h1>
+      <canvas id="scavenge" width="800" height="300"></canvas>
+      <h1>Mark and Sweep</h1>
+      <canvas id="markAndSweep" width="800" height="300"></canvas>
+
+      <script>
+        var scavengeCanvas = document.getElementById("scavenge");
+        var ctxScavenge = scavengeCanvas.getContext("2d");
+        var markAndSweepCanvas = document.getElementById("markAndSweep");
+        var ctxMarkAndSweep = markAndSweepCanvas.getContext("2d");
+        var memoryUsageCanvas = document.getElementById("memoryUsage");
+        var ctxMemoryUsage = memoryUsageCanvas.getContext("2d");
+
+        function draw(file) {
+
+          ctxScavenge.clearRect(0, 0, scavengeCanvas.width, scavengeCanvas.height);
+          ctxMarkAndSweep.clearRect(0, 0, markAndSweepCanvas.width, markAndSweepCanvas.height);
+          ctxMemoryUsage.clearRect(0, 0, memoryUsageCanvas.width, memoryUsageCanvas.height);
+
+          fetch(`/profiles/${file}`)
+            .then(response => response.json())
+            .then(data => {
+
+            var scavengeChart = new Chart(ctxScavenge, {
+              type: 'bar',
+              data: data[0]
+            });
+
+            var markAndSweepChart = new Chart(ctxMarkAndSweep, {
+              type: 'bar',
+              data: data[1]
+            });
+
+
+            var memoryUsageChart = new Chart(ctxMemoryUsage, {
+              type: 'line',
+              data: data[2]
+            });
+            })
+
+        }
+
+
+        fetch('/profiles')
+          .then(response => response.json())
+          .then((files) => {
+
+              const select = document.getElementById('profiles')
+              let options = '';
+
+              files
+                .filter(file => file.endsWith('.gc'))
+                .forEach(file => options += `<option value="${file}">${file}</option>`)
+
+              options += `<option value="0" selected>Nothing</option>`
+              select.innerHTML = options;
+
+              select.onchange = (evt) => { draw(evt.target.value) }
+          });
+      </script>
+  </body>
+</html>

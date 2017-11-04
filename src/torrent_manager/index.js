@@ -1,10 +1,10 @@
 const torrentManager = require('./torrent_manager')
 const dropboxWatcher = require('./dropbox_watcher')
 
-const profiler = require('../lib/cpuprofiler')
+const cpuProfiler = require('../lib/cpuProfiler')
 
 if (process.argv[2] == '-p') {
-  profiler('./public/profiles', 'torrent_manager')
+  cpuProfiler('./public/profiles', 'torrent_manager')
 }
 
 torrentManager

@@ -30,9 +30,9 @@ const generateHtmlPlayer = (streamType, path, url) => {
       const params = url ? querystring.stringify({ url }) : querystring.stringify({ path })
 
       const subs = subFiles.map(file => {
-        const matches = file.match(/(\S{2})\.srt$/)
+        const lang = file.match(/(\S{2})\.srt$/)[1]
         const params = querystring.stringify({ path: file })
-        return `<track src="http://${config.api.host}:${config.api.port}/subtitlesStream?${params}" kind="subtitles" srclang="${matches[1]}" />`
+        return `<track src="http://${config.api.host}:${config.api.port}/subtitlesStream?${params}" kind="subtitles" srclang="${lang}" />`
       })
 
       let type = path.endsWith('.mkv') ? 'video/webm; codecs="a_ac3, avc, theora, vorbis"' : 'video/webm';

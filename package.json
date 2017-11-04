@@ -5,7 +5,7 @@
   "main": "./src/index.js",
   "scripts": {
     "start": "DEBUG=odin:* node src/main/index.js",
-    "profile": "rm public/profiles/*.cpuprofile && DEBUG=odin:* node src/main/index.js -p",
+    "profile": "node src/main/index.js -p",
     "test": "standard-focus"
   },
   "bin": "./src/index.js",
@@ -16,6 +16,8 @@
     "config": "^1.26.1",
     "debug": "^2.6.8",
     "express": "^4.15.3",
+    "gc-profiler": "^1.4.0",
+    "get-port": "^3.2.0",
     "google-images": "^2.1.0",
     "imdb-api": "^3.1.1",
     "is-valid-path": "^0.1.1",

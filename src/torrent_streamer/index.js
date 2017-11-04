@@ -4,11 +4,16 @@ const config = require('config')
 const { createServer } = require('http')
 const tmpCleaner = require('./tmp_cleaner')
 const api = require('./api')
-const profiler = require('../lib/cpuprofiler')
+const cpuProfiler = require('../lib/cpuProfiler')
 const heapDump = require('../lib/heapDump')
-
+const gcProfiler = require('../lib/gcProfiler')
+// const memwatch = require('memwatch')
 if (process.argv[2] == '-p') {
-  profiler('./public/profiles', 'torrent_streamer')
+// memwatch.on('leak', function(info) {
+// console.error('Memory leak detected: ', info);
+// });
+  gcProfiler.init('./public/profiles', 'torrent_streamer')
+  cpuProfiler.init('./public/profiles', 'torrent_streamer')
   heapDump.init('./public/profiles', 'torrent_streamer')
 }
 

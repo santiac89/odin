@@ -9,15 +9,14 @@
 var fs = require('fs');
 var profiler = require('v8-profiler');
 var _datadir = null;
-var _name = null;
+
 /**
  * Init and schedule profiler runs
  *
  * @param datadir Folder to save the data to
  */
-function init(datadir, name) {
+function init(datadir) {
     _datadir = datadir;
-    _name = name
     setInterval(startProfiling, 30 * 1000);
 };
 
@@ -26,7 +25,7 @@ function init(datadir, name) {
  */
 function startProfiling() {
     var stamp = Date.now();
-    var id = _name + '-profile-' + stamp;
+    var id = 'profile-' + stamp;
 
     // Use stdout directly to bypass eventloop
     fs.writeSync(1, 'Start profiler with Id [' + id + ']\n');
@@ -52,5 +51,5 @@ function stopProfiling(id) {
     });
 }
 
-module.exports = { init };
+if (process.argv[2]) { init(process.argv[2]) }
 

@@ -4,12 +4,12 @@ const { createServer } = require('http')
 const { fork } = require('child_process')
 const log = require('debug')('odin:main')
 const api = require('./api')
-const profiler = require('../lib/cpuprofiler')
+const cpuProfiler = require('../lib/cpuProfiler')
 
 let args = [];
 
 if (process.argv[2] == '-p') {
-  profiler('./public/profiles', 'main')
+  cpuProfiler.init('./public/profiles', 'main')
   args[0] = '-p';
 }
 

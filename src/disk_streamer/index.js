@@ -3,10 +3,10 @@ const log = require('debug')('odin:disk_streamer')
 const config = require('config')
 const { createServer } = require('http')
 const api = require('./api')
-const profiler = require('../lib/cpuprofiler')
+const cpuProfiler = require('../lib/cpuProfiler')
 
 if (process.argv[2] == '-p') {
-  profiler('./public/profiles', 'disk_streamer')
+  cpuProfiler.init('./public/profiles', 'disk_streamer')
 }
 
 let server = createServer(api)
