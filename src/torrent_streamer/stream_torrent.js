@@ -11,7 +11,7 @@ if (!fs.existsSync(folder)) {
   fs.mkdirSync(folder)
 }
 
-const webTorrentClient = new WebTorrent()
+const webTorrentClient = new WebTorrent({ maxConns: 3 })
 const tmpTorrents = {}
 
 const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {

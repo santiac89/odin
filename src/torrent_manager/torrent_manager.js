@@ -10,7 +10,7 @@ const torrentsLog = require('./torrents_log')
 
 const folder = path.normalize(`${__dirname}/../../incomplete`)
 
-const webTorrentClient = new WebTorrent()
+const webTorrentClient = new WebTorrent({ maxConns: 3 })
 const tmpTorrents = {}
 
 if (!fs.existsSync(folder)) {
