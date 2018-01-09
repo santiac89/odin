@@ -1,8 +1,9 @@
 const config = require('config')
 const crypto = require('crypto')
 const dropbox = require('../clients/dropbox')
-const subtitlesManager = require('../lib/subtitles_manager')
-const postersManager = require('../lib/posters_manager')
+const subtitlesManager = require('./subtitles_manager')
+const postersManager = require('./posters_manager')
+
 const fs = require('fs')
 const path = require('path')
 

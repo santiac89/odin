@@ -12,6 +12,8 @@ const getAll = () => torrents
 
 const get = (magnetOrUrl) => torrents[magnetOrUrl]
 
+const exists = (magnetOrUrl) => torrents[magnetOrUrl] != undefined
+
 const touch = (magnetOrUrl) => torrents[magnetOrUrl] = true
 
 const add = (torrent, magnetOrUrl) => new Promise((resolve, reject) => {

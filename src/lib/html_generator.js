@@ -20,13 +20,14 @@ const generateForFile = (path) => {
 }
 
 const generateHtmlPlayer = (streamType, path, url) => {
+  console.log('ASDASD')
   return subtitlesManager.fetchSubtitles(path)
     .catch(err => {
       log('Couldn\'t download any sub:', err)
       return [];
     })
     .then((subFiles) => {
-      const port = streamType === DISK_STREAM ? config.disk_streamer.port : config.torrent_streamer.port
+      // const port = streamType === DISK_STREAM ? config.disk_streamer.port : config.torrent_streamer.port
       const params = url ? querystring.stringify({ url }) : querystring.stringify({ path })
 
       const subs = subFiles.map(file => {
@@ -39,7 +40,7 @@ const generateHtmlPlayer = (streamType, path, url) => {
 
       return `
         <video class="player" crossorigin="anonymous" controls>
-          <source src="http://${config.api.host}:${port}/${streamType}Stream?${params}" type='${type}'>
+          <source src="http://${config.api.host}:${config.api.port}/${streamType}Stream?${params}" type='${type}'>
           ${subs.join('')}
         </video>
       `
