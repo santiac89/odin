@@ -54,4 +54,4 @@ const remove = (magnetOrUrl) => new Promise((resolve, reject) => {
   })
 })
 
-module.exports = { add, load, remove, get, touch, getAll }
+module.exports = { add, load, remove, get, touch, getAll, exists }

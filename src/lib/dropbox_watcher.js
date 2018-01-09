@@ -1,11 +1,11 @@
 const config = require('config')
 const crypto = require('crypto')
+const fs = require('fs')
+const path = require('path')
 const dropbox = require('../clients/dropbox')
 const subtitlesManager = require('./subtitles_manager')
 const postersManager = require('./posters_manager')
-
-const fs = require('fs')
-const path = require('path')
+const torrentManager = require('./torrent_manager')
 
 const folder = path.normalize(`${__dirname}/../watch`)
 
@@ -13,7 +13,7 @@ if (!fs.existsSync(folder)) {
   fs.mkdirSync(folder)
 }
 
-const start = (torrentManager) => {
+const start = () => {
   if (!config.dropbox.token || !config.dropbox.torrentsPath) return;
 
   setInterval(() => {

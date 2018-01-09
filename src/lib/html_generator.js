@@ -20,14 +20,13 @@ const generateForFile = (path) => {
 }
 
 const generateHtmlPlayer = (streamType, path, url) => {
-  console.log('ASDASD')
   return subtitlesManager.fetchSubtitles(path)
     .catch(err => {
       log('Couldn\'t download any sub:', err)
       return [];
     })
     .then((subFiles) => {
-      // const port = streamType === DISK_STREAM ? config.disk_streamer.port : config.torrent_streamer.port
+
       const params = url ? querystring.stringify({ url }) : querystring.stringify({ path })
 
       const subs = subFiles.map(file => {
@@ -47,7 +46,4 @@ const generateHtmlPlayer = (streamType, path, url) => {
     })
 }
 
-module.exports = {
-  generateForTorrent,
-  generateForFile,
-}
+module.exports = { generateForTorrent, generateForFile }
