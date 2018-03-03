@@ -5,9 +5,11 @@ const { fork } = require('child_process')
 const log = require('debug')('odin:main')
 const api = require('./api')
 const dropboxWatcher = require('./lib/dropbox_watcher')
+const library = require('./lib/library')
 
 let server = createServer(api)
 
 server.listen(config.api.port, () => log('odin listening to you on port 3000!'))
 
+library.reload();
 dropboxWatcher.start();
