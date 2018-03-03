@@ -8,9 +8,9 @@ const buildMovieObject = (path, name, posterFile) => ({ path, name, poster: `/im
 
 const reload = () => {
   movies = []
-  const folders = fs.readdirSync(config.webtorrent.download_path)
+  const folders = fs.readdirSync(config.webtorrent.paths.download_path)
   folders.forEach((folder) => {
-    const fullPath = `${config.webtorrent.download_path}/${folder}`
+    const fullPath = `${config.webtorrent.paths.download_path}/${folder}`
     const fileStats = fs.lstatSync(fullPath)
 
     if (!fileStats.isDirectory() && isVideoFile(fullPath)) {
