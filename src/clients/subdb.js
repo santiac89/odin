@@ -1,5 +1,6 @@
 const log = require('debug')('odin:subdb.js')
 const SubDb = require('subdb')
+const config = require('config')
 
 const subdb = new SubDb()
 
@@ -28,10 +29,9 @@ const downloadSubtitles = (path) => new Promise((resolve, reject) => {
         return resolve([])
       }
 
-      const promises = subsByLang.map((lang) => {
-        const subFile = path.replace(/mp4$/, `${lang}.srt`)
-        return downloadSubtitle(hash, lang, subFile)
-      })
+      const promises = subsByLang
+        .filter(lang => config.subtitles.includes(lang))
+        .map(lang => downloadSubtitle(hash, lang, path.replace(/mp4$/, `${lang}.srt`)))
 
       return Promise.all(promises)
     })
