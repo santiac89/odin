@@ -31,7 +31,7 @@ const isValidTorrentLink = (magnetOrUrl) => magnetOrUrl && (validUrl.isUri(magne
 
 const startTmpCleaner = () => {
   setInterval(() => {
-    fs.readdir(folder, (err, files) => {
+    fs.readdir(tmpPath, (err, files) => {
       if (err) throw err;
       files.forEach(file => {
         fs.stat(path.join(folder, file), (err, stats) => {
