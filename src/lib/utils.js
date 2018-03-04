@@ -1,62 +1,63 @@
-const https = require('https')
-const http = require('http')
-const log = require('debug')('odin:utils')
-const fs = require('fs')
-const magnet = require('magnet-uri')
-const validUrl = require('valid-url')
+const https = require('https');
+const http = require('http');
+const log = require('debug')('odin:utils');
+const fs = require('fs');
 
 const findLargestFile = (files) => {
-  let max = 0
-  let largestFile
+  let max = 0;
+  let largestFile;
 
-  if (!files) return null
+  if (!files) return null;
 
   files.forEach(file => {
     if (file.length > max) {
-      max = file.length
-      largestFile = file
+      max = file.length;
+      largestFile = file;
     }
-  })
+  });
 
-  return largestFile
+  return largestFile;
 }
-
 
 const downloadFile = (url, dest) => new Promise((resolve, reject) => {
-  const file = fs.createWriteStream(dest)
-  let client = url.startsWith('https') ? https : http
+  const file = fs.createWriteStream(dest);
+  let client = url.startsWith('https') ? https : http;
 
   client.get(url, (response) => {
-    response.pipe(file)
+    response.pipe(file);
 
     file.on('finish', () => {
-      file.close()
-      resolve(dest)
-    });
+      file.close();
+      resolve(dest);
+    });;
 
     file.on('error', (err) => {
-      log(err)
-      resolve()
-    })
+      log(err);
+      resolve();
+    });
   }).on('error', (err) => { // Handle errors
-    log(err)
-    resolve()
+    log(err);
+    resolve();
   });
-})
+});
 
-
-const isVideoFile = file => ['.mp4', '.mkv', '.avi'].some(format => file.endsWith(format))
+const isVideoFile = file => ['.mp4', '.mkv', '.avi'].some(format => file.endsWith(format));
 
 const findVideoFile = (torrent) => {
-  const file = findLargestFile(torrent.files)
-  return file && isVideoFile(file.name) ? file : null
+  const file = findLargestFile(torrent.files);
+  return file && isVideoFile(file.name) ? file : null;
 }
 
-const isValidTorrentLink = (magnetOrUrl) => magnetOrUrl && (validUrl.isUri(magnetOrUrl) || magnet.decode(magnetOrUrl).infoHash)
+const moveFile = (src, dst) => new Promise((resolve, reject) => {
+  mv(src, dst, (err) => {
+    if (err) return reject(err);
+    resolve();
+  });
+});
 
 module.exports = {
   downloadFile,
   isVideoFile,
   findVideoFile,
-  isValidTorrentLink
-}
+  moveFile
+};

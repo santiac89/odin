@@ -19,6 +19,7 @@
     "google-images": "^2.1.0",
     "is-valid-path": "^0.1.1",
     "magnet-uri": "^5.1.7",
+    "mv": "^2.1.1",
     "node-watch": "^0.5.5",
     "nodemon": "^1.11.0",
     "opensubtitles-api": "^4.0.0",

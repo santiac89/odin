@@ -1,33 +1,33 @@
-const fs = require('fs')
-const config = require('config')
-const { isVideoFile } = require('./utils')
+const fs = require('fs');
+const config = require('config');
+const { isVideoFile } = require('./utils');
 
-let movies = []
+let movies = [];
 
-const buildMovieObject = (path, name, posterFile) => ({ path, name, poster: `/images/${posterFile}.jpg` })
+const buildMovieObject = (path, name, posterFile) => ({ path, name, poster: `/images/${posterFile}.jpg` });
 
 const reload = () => {
-  movies = []
-  const folders = fs.readdirSync(config.webtorrent.download_path)
+  movies = [];
+  const folders = fs.readdirSync(config.webtorrent.download_path);
   folders.forEach((folder) => {
-    const fullPath = `${config.webtorrent.download_path}/${folder}`
-    const fileStats = fs.lstatSync(fullPath)
+    const fullPath = `${config.webtorrent.download_path}/${folder}`;
+    const fileStats = fs.lstatSync(fullPath);
 
     if (!fileStats.isDirectory() && isVideoFile(fullPath)) {
-      movies.push(buildMovieObject(fullPath, folder, folder))
+      movies.push(buildMovieObject(fullPath, folder, folder));
     } else if (fileStats.isDirectory()) {
-      const files = fs.readdirSync(fullPath)
-      let videoFile = files.find(file => isVideoFile(file))
+      const files = fs.readdirSync(fullPath);
+      const videoFile = files.find(file => isVideoFile(file));
 
       if (videoFile) {
-        movies.push(buildMovieObject(`${fullPath}/${videoFile}`, folder, videoFile))
+        movies.push(buildMovieObject(`${fullPath}/${videoFile}`, folder, videoFile));
       }
     }
-  })
+  });
 
-  return movies
+  return movies;
 }
 
-const files = () => movies
+const files = () => movies;
 
-module.exports = { reload, files }
+module.exports = { reload, files };
