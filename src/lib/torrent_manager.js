@@ -98,7 +98,10 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
         .then(() => {
           torrent.on('done', () => {
             const file = utils.findVideoFile(torrent);
-            console.log(file.path)
+            console.log(file.path);
+            console.log(file.name);
+            console.log(torrent.path);
+            console.log(torrent.name);
             torrentsLog
               .remove(magnetOrUrl)
               .then(() => { if (isFile) fs.unlinkSync(magnetOrUrl); return true }) // Remove .torrent file if is a file
