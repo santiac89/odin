@@ -2,7 +2,7 @@ const fs = require('fs');
 const utils = require('./utils');
 
 const streamFromDisk = (path, request, response) => {
-  fs.stat(path, (stats) => {
+  fs.stat(path, (err, stats) => {
     const { start, end } = parsePositions(request.headers.range, stats.size);
     let stream = fs.createReadStream(path, { start, end });
     streamToResponse(stream, start, end, stats.size, response);
