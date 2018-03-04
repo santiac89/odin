@@ -10,6 +10,7 @@ const subtitlesManager = require('./subtitles_manager');
 const postersManager = require('./posters_manager');
 const utils = require('./utils');
 const torrentsLog = require('./torrents_log');
+const library = require('./library');
 
 const incompletePath = path.normalize(`${__dirname}/../../incomplete`);
 const tmpPath = path.normalize(`${__dirname}/../../tmp`);
@@ -102,10 +103,11 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
             torrentsLog
               .remove(magnetOrUrl)
               .then(() => { if (isFile) fs.unlinkSync(magnetOrUrl); return true }) // Remove .torrent file if is a file
-              .then(() => utils.moveFile(`${torrent.path}/${torrent.name}`, `${config.webtorrent.download_path}`))
+              .then(() => utils.moveFile(`${torrent.path}/${torrent.name}`, `${config.webtorrent.download_path}/${torrent.name}`))
               .then(() => subtitlesManager.fetchSubtitles(`${config.webtorrent.download_path}/${file.path}`)) // Maybe remove this 2 lines
               .then(() => postersManager.fetchPoster(torrent.name, file.name))
               .then(() => webTorrentClient.remove(magnetOrUrl))
+              .then(() => library.reload())
               .then(() => torrent.emit('completed'));
           });
 
