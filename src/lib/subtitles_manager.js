@@ -8,6 +8,9 @@ const opensubtitles = require('../clients/opensubtitles');
 const fetchSubtitles = (moviePath) => new Promise((resolve, reject) => {
   const dirname = path.dirname(moviePath);
 
+  console.log(dirname);
+  console.log(moviePath);
+
   fs.readdir(dirname, (err, files) => {
     if (err) {
       log('Error: %s', err);
