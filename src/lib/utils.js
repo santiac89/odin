@@ -2,6 +2,7 @@ const https = require('https');
 const http = require('http');
 const log = require('debug')('odin:utils');
 const fs = require('fs');
+const mv = require('mv');
 
 const findLargestFile = (files) => {
   let max = 0;

@@ -4,7 +4,6 @@ const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
 const log = require('debug')('odin:torrent_manager');
-const mv = require('mv');
 const magnet = require('magnet-uri');
 const validUrl = require('valid-url');
 const subtitlesManager = require('./subtitles_manager');
