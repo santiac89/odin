@@ -48,7 +48,7 @@ const startTmpCleaner = () => {
 }
 
 const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {
-  if (!utils.isValidTorrentLink(magnetOrUrl)) {
+  if (!isValidTorrentLink(magnetOrUrl)) {
     return reject('Invalid torrent URL or magnetURI.');
   }
 
@@ -88,7 +88,7 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
     await removeTmpTorrent(magnetOrUrl);
   }
 
-  if (!utils.isValidTorrentLink(magnetOrUrl) && !isFile) {
+  if (!isValidTorrentLink(magnetOrUrl) && !isFile) {
     return reject('Invalid torrent URL or magnetURI');
   }
 
