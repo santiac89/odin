@@ -102,9 +102,9 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
             torrentsLog
               .remove(magnetOrUrl)
               .then(() => { if (isFile) fs.unlinkSync(magnetOrUrl); return true }) // Remove .torrent file if is a file
-              .then(() => subtitlesManager.fetchSubtitles(`${torrent.path}/${file.path}`)) // Maybe remove this 2 lines
+              .then(() => utils.moveFile(`${torrent.path}/${torrent.name}`, `${config.webtorrent.download_path}`))
+              .then(() => subtitlesManager.fetchSubtitles(`${config.webtorrent.download_path}/${file.path}`)) // Maybe remove this 2 lines
               .then(() => postersManager.fetchPoster(torrent.name, file.name))
-              .then(() => utils.moveFile(`${torrent.path}/${torrent.name}`, `${config.webtorrent.download_path}/${torrent.name}`))
               .then(() => webTorrentClient.remove(magnetOrUrl))
               .then(() => torrent.emit('completed'));
           });
