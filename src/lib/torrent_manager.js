@@ -34,7 +34,7 @@ const startTmpCleaner = () => {
     fs.readdir(tmpPath, (err, files) => {
       if (err) throw err;
       files.forEach(file => {
-        fs.stat(path.join(folder, file), (err, stats) => {
+        fs.stat(path.join(tmpPath, file), (err, stats) => {
           const hrTime = process.hrtime();
           const now = (hrTime[0] * 1000000) + (hrTime[1] / 1000);
 
