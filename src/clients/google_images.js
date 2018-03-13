@@ -1,22 +1,25 @@
-const config = require('config');
-const qs = require('querystring');
-const https = require('https');
+const config = require("config");
+const qs = require("querystring");
+const https = require("https");
+const log = require("debug")("odin:google_images");
 
 const search = (string) => new Promise((resolve, reject) => {
   const result = {
     q: string,
-    searchType: 'image',
+    searchType: "image",
     cx: config.google_cse.cse_id,
     key: config.google_cse.api_key
   };
 
   const url = `https://www.googleapis.com/customsearch/v1?${qs.stringify(result)}`;
 
+  log(`Searching images with terms [${string}]`);
+
   https.get(url, (res) => {
-    let body = '';
-    res.on('data', (chunk) => body += chunk);
-    res.on('end', () => resolve(body));
-    res.on('error', (error) => reject(error));
+    let body = ";
+    res.on("data", (chunk) => body += chunk);
+    res.on("end", () => resolve(body));
+    res.on("error", (error) => reject(error));
   });
 });
 

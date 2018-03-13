@@ -1,5 +1,5 @@
-const log = require('debug')('odin:torrents_log');
-const fs = require('fs');
+const log = require("debug")("odin:torrents_log");
+const fs = require("fs");
 
 const torrents = {};
 const folder = `${__dirname}/../../inprogress`;
@@ -33,8 +33,8 @@ const load = () => new Promise((resolve, reject) => {
 
     const torrentsPromises = files.map(file => {
       return new Promise((res, rej) => {
-        fs.readFile(`${folder}/${file}`, 'utf-8', (err, magnetOrUrl) => {
-          if (err) return res('');
+        fs.readFile(`${folder}/${file}`, "utf-8", (err, magnetOrUrl) => {
+          if (err) return res("");
           res(magnetOrUrl);
         });
       });

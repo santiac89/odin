@@ -1,6 +1,6 @@
-const fs = require('fs');
-const config = require('config');
-const { isVideoFile } = require('./utils');
+const fs = require("fs");
+const config = require("config");
+const { isVideoFile } = require("./utils");
 
 let movies = [];
 

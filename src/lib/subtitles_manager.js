@@ -1,6 +1,6 @@
 const config = require('config');
 const path = require('path');
-const log = require('debug')('odin:subtitles_manager.js');
+const log = require('debug')('odin:subtitles_manager');
 const fs = require('fs');
 const subdb = require('../clients/subdb');
 const opensubtitles = require('../clients/opensubtitles');
@@ -16,7 +16,10 @@ const fetchSubtitles = (moviePath) => new Promise((resolve, reject) => {
 
     const subs = files.filter(file => file.endsWith('.srt')).map(file => `${dirname}/${file}`);
 
-    if (subs.length > 0) return resolve(subs);
+    if (subs.length > 0) {
+      log(`Subtitles found for [${moviePath}] %O`, subs);
+      return resolve(subs);
+    }
 
     if (config.opensubtitles.username && config.opensubtitles.password && config.opensubtitles.useragent) {
       opensubtitles

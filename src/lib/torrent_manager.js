@@ -1,16 +1,16 @@
-const WebTorrent = require('webtorrent');
-const config = require('config');
-const path = require('path');
-const fs = require('fs');
-const rimraf = require('rimraf');
-const log = require('debug')('odin:torrent_manager');
-const magnet = require('magnet-uri');
-const validUrl = require('valid-url');
-const subtitlesManager = require('./subtitles_manager');
-const postersManager = require('./posters_manager');
-const utils = require('./utils');
-const torrentsLog = require('./torrents_log');
-const library = require('./library');
+const WebTorrent = require("webtorrent");
+const config = require("config");
+const path = require("path");
+const fs = require("fs");
+const rimraf = require("rimraf");
+const log = require("debug")("odin:torrent_manager");
+const magnet = require("magnet-uri");
+const validUrl = require("valid-url");
+const subtitlesManager = require("./subtitles_manager");
+const postersManager = require("./posters_manager");
+const utils = require("./utils");
+const torrentsLog = require("./torrents_log");
+const library = require("./library");
 
 const incompletePath = path.normalize(`${__dirname}/../../incomplete`);
 const tmpPath = path.normalize(`${__dirname}/../../tmp`);
@@ -49,7 +49,7 @@ const startTmpCleaner = () => {
 
 const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {
   if (!isValidTorrentLink(magnetOrUrl)) {
-    return reject('Invalid torrent URL or magnetURI.');
+    return reject("Invalid torrent URL or magnetURI.");
   }
 
   if (torrentsLog.exists(magnetOrUrl) || tmpTorrents[magnetOrUrl]) {
@@ -61,8 +61,8 @@ const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {
   webTorrentClient.add(magnetOrUrl, { path: tmpPath }, (torrent) => {
     tmpTorrents[magnetOrUrl] = torrent;
 
-    torrent.on('done', () => {
-      torrent.emit('completed');
+    torrent.on("done", () => {
+      torrent.emit("completed");
     });
 
     resolve(torrent);
@@ -81,7 +81,7 @@ const removeTmpTorrent = (magnetOrUrl) => new Promise((resolve, reject) => {
 
 const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) => {
   if (torrentsLog.get(magnetOrUrl)) {
-    return reject('Torrent already downloading');
+    return reject("Torrent already downloading");
   }
 
   if (tmpTorrents[magnetOrUrl]) {
@@ -89,7 +89,7 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
   }
 
   if (!isValidTorrentLink(magnetOrUrl) && !isFile) {
-    return reject('Invalid torrent URL or magnetURI');
+    return reject("Invalid torrent URL or magnetURI");
   }
 
   torrentsLog.touch(magnetOrUrl);
@@ -97,7 +97,11 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
   webTorrentClient.add(magnetOrUrl, { path: incompletePath }, (torrent) => {
       torrentsLog.add(torrent, magnetOrUrl)
         .then(() => {
-          torrent.on('done', () => {
+          log(`Download started: ${torrent.name}`);
+
+          torrent.on("done", () => {
+            log(`Download complete: ${torrent.name}`);
+
             const file = utils.findVideoFile(torrent);
 
             torrentsLog
@@ -108,11 +112,11 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
               .then(() => postersManager.fetchPoster(torrent.name, file.name))
               .then(() => library.reload())
               .then(() => webTorrentClient.remove(torrent.infoHash))
-              .then(() => torrent.emit('completed'));
+              .then(() => torrent.emit("completed"));
           });
 
           if (torrent.progress === 1) {
-            torrent.emit('done');
+            torrent.emit("done");
           }
 
           resolve(torrent);
@@ -121,18 +125,19 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
 });
 
 const resume = () => {
-  webTorrentClient.on('error', (err) => console.log(err));
+  webTorrentClient.on("error", log);
 
   return torrentsLog.load()
-    .then(magnetsOrUrls => magnetsOrUrls.map(magnetOrUrl => download(magnetOrUrl, magnetOrUrl.startsWith('/'))))
+    .then(magnetsOrUrls => magnetsOrUrls.map(magnetOrUrl => download(magnetOrUrl, magnetOrUrl.startsWith("/"))))
     .then(promises => Promise.all(promises))
-    .then(() => startTmpCleaner());
+    .then(() => startTmpCleaner())
+    .catch(log);
 }
 
 const downloading = () => Object.values(torrentsLog.getAll()).map(torrent => ({
   hash: torrent.infoHash,
   magnetURI: torrent.magnetURI,
-  name: torrent.info ? torrent.info.name.toString('UTF-8') : 'undefined',
+  name: torrent.info ? torrent.info.name.toString("UTF-8") : "undefined",
   timeRemaining: torrent.timeRemaining,
   received: torrent.received,
   downloaded: torrent.downloaded,
