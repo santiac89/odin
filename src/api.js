@@ -3,10 +3,15 @@ const bodyParser = require("body-parser");
 const config = require("config");
 const fs = require("fs");
 const srt2vtt = require("srt-to-vtt");
+const path = require("path");
 const library = require("./lib/library");
 const torrentManager = require("./lib/torrent_manager");
 const htmlGenerator = require("./lib/html_generator");
 const videoStreamer = require("./lib/video_streamer");
+const fileUpload = require('express-fileupload');
+const utils = require("./lib/utils")
+
+const tmpPath = path.normalize(`${__dirname}/../tmp`);
 
 const app = express();
 /*
@@ -23,6 +28,7 @@ app.use(function (req, res, next) {
 
 app.use(express.static(config.public_path));
 
+
 app.use(function (req, res, next) {
   if (req.headers.origin) {
     const parts = req.headers.origin.split(":");
@@ -33,6 +39,8 @@ app.use(function (req, res, next) {
   }
   next();
 });
+
+app.use(fileUpload());
 
 /*
 *       API
@@ -45,7 +53,7 @@ app.get("/library", (req, res) => {
   res.json(library.files());
 });
 
-app.get("/subtitlesStream", (req, res) => {
+app.get("/subtitles", (req, res) => {
   fs.createReadStream(req.query.path).pipe(srt2vtt()).pipe(res);
 });
 
@@ -53,33 +61,64 @@ app.get("/torrents", (req, res) => {
   res.json(torrentManager.downloading());
 });
 
-app.put("/download", (req, res) => {
-  torrentManager.download(req.body.url)
-    .then(() => library.reload())
-    .then(() => res.end("OK"))
-    .catch(error => res.status(500).json(error));
+app.put("/download", async (req, res) => {
+  try {
+    const torrent = await torrentManager.download(req.body.url);
+    res.end("OK");
+  } catch (err) {
+    res.status(500).json(error)
+  }
 });
 
-app.get("/torrentStream", (req, res) => {
-  torrentManager.downloadTmp(req.query.url)
-    .then(torrent => videoStreamer.streamFromTorrent(torrent, req, res));
+
+app.get("/torrentPlayer", async (req, res) => {
+  try {
+    const torrent = await torrentManager.downloadTmp(req.query.url);
+    const html = await htmlGenerator.generateForTorrent(torrent, req.query.url);
+    res.json({ html, path: `${tmpPath}/${torrent.name}` });
+  } catch (err) {
+     res.status(500).send(err);
+  }
 });
 
-app.get("/torrentPlayer", (req, res) => {
-  torrentManager.downloadTmp(req.query.url)
-    .then(torrent => htmlGenerator.generateForTorrent(torrent, req.query.url))
-    .then(html => res.send(html))
-    .catch(err => res.status(500).send(err));
+app.get("/diskPlayer", async (req, res) => {
+  try {
+    const html = await htmlGenerator.generateForFile(req.query.path);
+    res.send(html)
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+/*
+  STREAMING
+*/
+app.get("/torrentStream", async (req, res) => {
+  const torrent = await torrentManager.downloadTmp(req.query.url);
+  videoStreamer.streamFromTorrent(torrent, req, res);
 });
 
 app.get("/diskStream", (req, res) => {
   videoStreamer.streamFromDisk(req.query.path, req, res);
 });
 
-app.get("/diskPlayer", (req, res) => {
-  htmlGenerator.generateForFile(req.query.path)
-    .then(html => res.send(html))
-    .catch(err => res.status(500).send(err));
+
+app.post("/subtitles", (req, res) => {
+  if (!req.body.path) return res.status(400).end();
+
+  const files = fs.readdirSync(req.body.path);
+  const videoFile = files.find(file => utils.isVideoFile(file));
+
+  if (videoFile) {
+    const fileName = videoFile.replace(/mp4$/, 'cs.srt');
+    const stream = fs.createWriteStream(`${req.body.path}/${fileName}`);
+    console.log(`${req.body.path}/${fileName}`)
+    stream.write(req.files.file.data);
+    stream.end();
+    res.send('OK');
+  } else {
+    res.status(400).end();
+  }
 });
 
 module.exports = app;

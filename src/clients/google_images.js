@@ -16,7 +16,7 @@ const search = (string) => new Promise((resolve, reject) => {
   log(`Searching images with terms [${string}]`);
 
   https.get(url, (res) => {
-    let body = ";
+    let body = "";
     res.on("data", (chunk) => body += chunk);
     res.on("end", () => resolve(body));
     res.on("error", (error) => reject(error));
