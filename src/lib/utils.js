@@ -42,7 +42,7 @@ const downloadFile = (url, dest) => new Promise((resolve, reject) => {
   });
 });
 
-const isVideoFile = file => [".mp4", ".mkv", ".avi"].some(format => file.endsWith(format));
+const isVideoFile = file => [".mp4", ".avi"].some(format => file.endsWith(format));
 
 const findVideoFile = (torrent) => {
   const file = findLargestFile(torrent.files);
@@ -50,6 +50,7 @@ const findVideoFile = (torrent) => {
 }
 
 const moveFile = (src, dst) => new Promise((resolve, reject) => {
+  log(`Moving file: ${src} -> ${dst}`);
   mv(src, dst, (err) => {
     if (err) return reject(err);
     resolve();

@@ -9,9 +9,7 @@ const DISK_STREAM = "disk";
 
 const generateForTorrent = (torrent, url) => {
   const file = utils.findVideoFile(torrent);
-
   if (!file) return `<div class="error">Sorry. Can't play this torrent :(</div>`;
-
   return generateHtmlPlayer(TORRENT_STREAM, `${torrent.path}/${file.path}`, url);
 }
 
@@ -25,7 +23,7 @@ const generateHtmlPlayer = async (streamType, path, url) => {
   try {
     subFiles = await subtitlesManager.fetchSubtitles(path);
   } catch (err) {
-    log("Couldn't find any subtitle:", err);
+    log(`Couldn't find any subtitle for [${path}] :`, err);
   }
 
   const params = url ? querystring.stringify({ url }) : querystring.stringify({ path });
@@ -34,13 +32,11 @@ const generateHtmlPlayer = async (streamType, path, url) => {
     const lang = file.match(/((subdb|opensubtitles)-\S{2})\.srt$/)[1];
     const params = querystring.stringify({ path: file });
     return `<track src="http://${config.api.host}:${config.api.port}/subtitles?${params}" kind="subtitles" srclang="${lang}" />`;
-  })
-
-  let type = path.endsWith(".mkv") ? 'video/webm; codecs="a_ac3, avc, theora, vorbis"' : "video/webm";
+  });
 
   return `
     <video class="player" crossorigin="anonymous" controls>
-      <source src="http://${config.api.host}:${config.api.port}/${streamType}Stream?${params}" type="${type}">
+      <source src="http://${config.api.host}:${config.api.port}/${streamType}Stream?${params}" type="video/webm">
       ${subs.join("")}
     </video>
   `;

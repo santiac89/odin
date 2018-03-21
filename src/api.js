@@ -71,7 +71,7 @@ app.put("/download", async (req, res) => {
 
 app.get("/torrentPlayer", async (req, res) => {
   try {
-    const torrent = await torrentManager.downloadTmp(req.query.url);
+    const torrent = await torrentManager.getTorrent(req.query.url);
     const html = await htmlGenerator.generateForTorrent(torrent, req.query.url);
     res.json({ html, path: `${tmpPath}/${torrent.name}` });
   } catch (err) {
@@ -89,7 +89,7 @@ app.get("/diskPlayer", async (req, res) => {
 });
 
 app.get("/torrentStream", async (req, res) => {
-  const torrent = await torrentManager.downloadTmp(req.query.url);
+  const torrent = await torrentManager.getTorrent(req.query.url);
   videoStreamer.streamFromTorrent(torrent, req, res);
 });
 
@@ -104,7 +104,7 @@ app.post("/subtitles", (req, res) => {
   const videoFile = files.find(file => utils.isVideoFile(file));
 
   if (videoFile) {
-    const fileName = videoFile.replace(/mp4$/, 'cs.srt');
+    const fileName = videoFile.replace(/(mp4|avi)$/, 'custom.srt');
     const stream = fs.createWriteStream(`${req.body.path}/${fileName}`);
     stream.write(req.files.file.data);
     stream.end();

@@ -1,5 +1,6 @@
 const fs = require("fs");
 const config = require("config");
+const log = require("debug")("odin:library");
 const { isVideoFile } = require("./utils");
 
 let movies = [];
@@ -7,6 +8,8 @@ let movies = [];
 const buildMovieObject = (path, name, posterFile) => ({ path, name, poster: `/images/${posterFile}.jpg` });
 
 const reload = () => {
+  log(`Reloading library at [${config.webtorrent.download_path}] ...`);
+
   movies = [];
   const folders = fs.readdirSync(config.webtorrent.download_path);
   folders.forEach((folder) => {

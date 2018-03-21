@@ -47,7 +47,7 @@ const startTmpCleaner = () => {
   }, tmpCleanerInterval);
 }
 
-const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {
+const getTorrent = (magnetOrUrl) => new Promise((resolve, reject) => {
   if (!isValidTorrentLink(magnetOrUrl)) {
     return reject("Invalid torrent URL or magnetURI.");
   }
@@ -60,11 +60,7 @@ const downloadTmp = (magnetOrUrl) => new Promise((resolve, reject) => {
 
   webTorrentClient.add(magnetOrUrl, { path: tmpPath }, (torrent) => {
     tmpTorrents[magnetOrUrl] = torrent;
-
-    torrent.on("done", () => {
-      torrent.emit("completed");
-    });
-
+    torrent.on("done", () => torrent.emit("completed"));
     resolve(torrent);
   });
 });
@@ -81,7 +77,9 @@ const removeTmpTorrent = (magnetOrUrl) => new Promise((resolve, reject) => {
 
 const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) => {
   if (torrentsLog.get(magnetOrUrl)) {
-    return reject("Torrent already downloading");
+    const message = `Torrent already downloading [${magnetOrUrl}]`;
+    log(message);
+    return reject(message);
   }
 
   if (tmpTorrents[magnetOrUrl]) {
@@ -89,7 +87,9 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
   }
 
   if (!isValidTorrentLink(magnetOrUrl) && !isFile) {
-    return reject("Invalid torrent URL or magnetURI");
+    const message = `Invalid torrent URL or magnetURI [${magnetOrUrl}]`;
+    log(message);
+    return reject(message);
   }
 
   torrentsLog.touch(magnetOrUrl);
@@ -106,7 +106,10 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
 
             torrentsLog
               .remove(magnetOrUrl)
-              .then(() => { if (isFile) fs.unlinkSync(magnetOrUrl); return true }) // Remove .torrent file if is a file
+              .then(() => {
+                if (isFile) fs.unlinkSync(magnetOrUrl); // Remove .torrent file if is a file
+                return true
+              })
               .then(() => utils.moveFile(`${torrent.path}/${torrent.name}`, `${config.webtorrent.download_path}/${torrent.name}`))
               .then(() => subtitlesManager.fetchSubtitles(`${config.webtorrent.download_path}/${file.path}`)) // Maybe remove this 2 lines
               .then(() => postersManager.fetchPoster(torrent.name, file.name))
@@ -124,14 +127,16 @@ const download = (magnetOrUrl, isFile) => new Promise(async (resolve, reject) =>
     });
 });
 
-const resume = () => {
-  webTorrentClient.on("error", log);
-
-  return torrentsLog.load()
-    .then(magnetsOrUrls => magnetsOrUrls.map(magnetOrUrl => download(magnetOrUrl, magnetOrUrl.startsWith("/"))))
-    .then(promises => Promise.all(promises))
-    .then(() => startTmpCleaner())
-    .catch(log);
+const resume = async () => {
+  try {
+    webTorrentClient.on("error", log);
+    const magnetsOrUrls = await torrentsLog.load();
+    const promises = magnetsOrUrls.map(magnetOrUrl => download(magnetOrUrl, magnetOrUrl.startsWith("/")));
+    await Promise.all(promises);
+    startTmpCleaner();
+  } catch (err) {
+    log(err);
+  }
 }
 
 const downloading = () => Object.values(torrentsLog.getAll()).map(torrent => ({
@@ -150,4 +155,4 @@ const downloading = () => Object.values(torrentsLog.getAll()).map(torrent => ({
   path: torrent.path
 }));
 
-module.exports = { resume, download, downloading, downloadTmp };
+module.exports = { resume, download, downloading, getTorrent };
