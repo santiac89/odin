@@ -33,7 +33,7 @@ const downloadSubtitles = (path) => new Promise((resolve, reject) => {
 
       const promises = subsByLang
         .filter(lang => config.subtitles.includes(lang))
-        .map(lang => downloadSubtitle(hash, lang, path.replace(/mp4$/, `${lang}.srt`)));
+        .map(lang => downloadSubtitle(hash, lang, path.replace(/mp4$/, `subdb-${lang}.srt`)));
 
       return Promise.all(promises);
     });

@@ -19,31 +19,31 @@ const generateForFile = (path) => {
   return generateHtmlPlayer(DISK_STREAM, path);
 }
 
-const generateHtmlPlayer = (streamType, path, url) => {
-  return subtitlesManager.fetchSubtitles(path)
-    .catch(err => {
-      log("Couldn't download any sub:", err)
-      return [];
-    })
-    .then((subFiles) => {
+const generateHtmlPlayer = async (streamType, path, url) => {
+  let subFiles = [];
 
-      const params = url ? querystring.stringify({ url }) : querystring.stringify({ path });
+  try {
+    subFiles = await subtitlesManager.fetchSubtitles(path);
+  } catch (err) {
+    log("Couldn't find any subtitle:", err);
+  }
 
-      const subs = subFiles.map(file => {
-        const lang = file.match(/(\S{2})\.srt$/)[1];
-        const params = querystring.stringify({ path: file });
-        return `<track src="http://${config.api.host}:${config.api.port}/subtitles?${params}" kind="subtitles" srclang="${lang}" />`;
-      })
+  const params = url ? querystring.stringify({ url }) : querystring.stringify({ path });
 
-      let type = path.endsWith(".mkv") ? 'video/webm; codecs="a_ac3, avc, theora, vorbis"' : "video/webm";
+  const subs = subFiles.map(file => {
+    const lang = file.match(/((subdb|opensubtitles)-\S{2})\.srt$/)[1];
+    const params = querystring.stringify({ path: file });
+    return `<track src="http://${config.api.host}:${config.api.port}/subtitles?${params}" kind="subtitles" srclang="${lang}" />`;
+  })
 
-      return `
-        <video class="player" crossorigin="anonymous" controls>
-          <source src="http://${config.api.host}:${config.api.port}/${streamType}Stream?${params}" type="${type}">
-          ${subs.join("")}
-        </video>
-      `;
-    });
+  let type = path.endsWith(".mkv") ? 'video/webm; codecs="a_ac3, avc, theora, vorbis"' : "video/webm";
+
+  return `
+    <video class="player" crossorigin="anonymous" controls>
+      <source src="http://${config.api.host}:${config.api.port}/${streamType}Stream?${params}" type="${type}">
+      ${subs.join("")}
+    </video>
+  `;
 }
 
 module.exports = { generateForTorrent, generateForFile };

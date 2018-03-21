@@ -6,7 +6,7 @@ const OS = require("opensubtitles-api");
 const config = require("config");
 const { downloadFile } = require("../lib/utils");
 
-const downloadSubtitles = (moviePath) => {
+const downloadSubtitles = async (moviePath) => {
   const OpenSubtitles = new OS({
     useragent: config.opensubtitles.useragent,
     username: config.opensubtitles.username,
@@ -16,29 +16,29 @@ const downloadSubtitles = (moviePath) => {
 
   const filename = path.basename(moviePath);
 
-  return OpenSubtitles.login()
-    .then(() => OpenSubtitles.search({ filename }))
-    .then(subtitles => {
+  try {
+    await OpenSubtitles.login();
 
-      log(`Subtitles found for [${moviePath}]: %O`, subtitles);
+    const subtitles = await OpenSubtitles.search({ filename });
 
-      const langs = Object.keys(subtitles);
+    log(`Subtitles found for [${moviePath}]: %O`, subtitles);
 
-      if (!langs.length) {
-        log(`No subtitle found for [${moviePath}]`);
-        return Promise.resolve([]);
-      }
+    const langs = Object.keys(subtitles);
 
-      const promises = langs
-        .filter(lang => config.subtitles.includes(lang))
-        .map(lang => downloadFile(subtitles[lang].url, moviePath.replace(/mp4$/, `${lang}.srt`)));
+    if (!langs.length) {
+      log(`No subtitle found for [${moviePath}]`);
+      return [];
+    }
 
-      return Promise.all(promises);
-    })
-    .catch(err => {
-      log("Error: %s", err);
-      return Promise.resolve([]);
-    });
+    const promises = langs
+      .filter(lang => config.subtitles.includes(lang))
+      .map(lang => downloadFile(subtitles[lang].url, moviePath.replace(/mp4$/, `opensubtitles-${lang}.srt`)));
+
+    return await Promise.all(promises);
+  } catch (err) {
+    log("Error: %s", err);
+    return [];
+  }
 }
 
 module.exports = { downloadSubtitles };

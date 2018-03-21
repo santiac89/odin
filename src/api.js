@@ -14,9 +14,7 @@ const utils = require("./lib/utils")
 const tmpPath = path.normalize(`${__dirname}/../tmp`);
 
 const app = express();
-/*
-*       MIDDLEWARES
-*/
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(function (req, res, next) {
@@ -90,9 +88,6 @@ app.get("/diskPlayer", async (req, res) => {
   }
 });
 
-/*
-  STREAMING
-*/
 app.get("/torrentStream", async (req, res) => {
   const torrent = await torrentManager.downloadTmp(req.query.url);
   videoStreamer.streamFromTorrent(torrent, req, res);
@@ -101,7 +96,6 @@ app.get("/torrentStream", async (req, res) => {
 app.get("/diskStream", (req, res) => {
   videoStreamer.streamFromDisk(req.query.path, req, res);
 });
-
 
 app.post("/subtitles", (req, res) => {
   if (!req.body.path) return res.status(400).end();
@@ -112,7 +106,6 @@ app.post("/subtitles", (req, res) => {
   if (videoFile) {
     const fileName = videoFile.replace(/mp4$/, 'cs.srt');
     const stream = fs.createWriteStream(`${req.body.path}/${fileName}`);
-    console.log(`${req.body.path}/${fileName}`)
     stream.write(req.files.file.data);
     stream.end();
     res.send('OK');
