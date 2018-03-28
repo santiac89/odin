@@ -31,7 +31,7 @@ const downloadFile = (path, dest) => new Promise((resolve, reject) => {
     method: "POST",
     json: true,
     headers: {
-      Authorization: `Bearer ${config.dropbox.token}`,
+      "Authorization": `Bearer ${config.dropbox.token}`,
       "Dropbox-API-Arg": `{ "path": "${path}" }`
     }
   })
@@ -39,7 +39,6 @@ const downloadFile = (path, dest) => new Promise((resolve, reject) => {
   .on("response", response => resolve(response))
   .pipe(fs.createWriteStream(dest))
 });
-
 
 const deleteFile = (path) => new Promise((resolve, reject) => {
   request({

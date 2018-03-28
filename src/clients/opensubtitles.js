@@ -1,4 +1,4 @@
-const log = require("debug")("odin:opensubtitles.js");
+const log = require("debug")("odin:opensubtitles");
 const https = require("https");
 const fs = require("fs");
 const path = require("path");
@@ -18,11 +18,8 @@ const downloadSubtitles = async (moviePath) => {
 
   try {
     await OpenSubtitles.login();
-
     const subtitles = await OpenSubtitles.search({ filename });
-
     log(`Subtitles found for [${moviePath}]: %O`, subtitles);
-
     const langs = Object.keys(subtitles);
 
     if (!langs.length) {

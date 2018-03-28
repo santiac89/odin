@@ -27,7 +27,7 @@ const start = () => {
     }
 
     files
-      .filter(file => file.name.endsWith(".torrent"));
+      .filter(file => file.name.endsWith(".torrent"))
       .forEach(async (file) => {
         try {
           log(`Downloading [${file}]`);

@@ -26,7 +26,6 @@ app.use(function (req, res, next) {
 
 app.use(express.static(config.public_path));
 
-
 app.use(function (req, res, next) {
   if (req.headers.origin) {
     const parts = req.headers.origin.split(":");
@@ -64,7 +63,7 @@ app.put("/download", async (req, res) => {
     const torrent = await torrentManager.download(req.body.url);
     res.end("OK");
   } catch (err) {
-    res.status(500).json(error)
+    res.status(500).json(err);
   }
 });
 
